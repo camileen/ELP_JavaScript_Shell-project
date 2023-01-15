@@ -14,14 +14,14 @@ CAHIER DES CHARGES :
 - Pouvoir tuer, mettre en pause ou reprendre un processus avec une commande
   'bing [-k|-p|-c] <processId>' => OK
 
-- Pouvoir exécuter en tâche de fond un programme avec le postfix '!'
+- Pouvoir exécuter en tâche de fond un programme avec le postfix '!' => OK
 
-- Sortir du shell sur Ctrl+p
+- Sortir du shell sur Ctrl+p => OK
 
 - Détacher certains processus du CLIi avec la commande keep <processId>
 
 
 INTERESTING MODULES :
 - prompts
-- events
+- readline
 - child_process
