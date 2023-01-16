@@ -22,7 +22,12 @@ function execute_sync(command) {
     }
 
     if (/^\./.test(command) || /^\//.test(command)) {
-        buffer = execSync(command);
+        if (/(.py)$/.test(command)) {
+            buffer = execSync(`python3 ${command}`)
+        } else {
+            buffer = execSync(command);
+        }
+        
     }
     
     console.log(buffer.toString('utf8'));
@@ -68,12 +73,22 @@ async function execute(command) {
     }
 
     if (/^\./.test(command.slice(1)) || /^\//.test(command.slice(1))) {
-        exec(command.slice(1), (err, output) => {
-            if (err) {
-                console.log("Can't execute file:", err);
-            }
-            console.log(output);
-        });
+        if (/(.py)$/.test(command)) {
+            exec(`python3 ${command.slice(1)}`, (err, output) => {
+                if (err) {
+                    console.log("Can't execute file:", err);
+                }
+                console.log(output);
+            });
+        } else {
+            exec(command.slice(1), (err, output) => {
+                if (err) {
+                    console.log("Can't execute file:", err);
+                }
+                console.log(output);
+            });
+        }
+        
     }
 
 }
