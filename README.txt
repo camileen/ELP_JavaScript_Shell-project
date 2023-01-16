@@ -25,3 +25,6 @@ INTERESTING MODULES :
 - prompts
 - readline
 - child_process
+
+ATTENTION : 
+- ce shell JavaScript ne peut être utilisé que s'il est exécuté sur un terminal Unix-like
