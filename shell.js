@@ -4,6 +4,10 @@ let readline = require('readline');
 readline.emitKeypressEvents(process.stdin);
 
 
+/* execute_sync(command)
+* execute command in a child process, waits for the result and prints it
+* @param : user input
+*/
 function execute_sync(command) {
     let buffer;
 
@@ -33,6 +37,11 @@ function execute_sync(command) {
     console.log(buffer.toString('utf8'));
 }
 
+/* execute(command)
+* Execute command in a child process, don't wait for the result
+* but prints it when it is ready
+* @param : user input
+*/
 async function execute(command) {
 
     if (command.slice(1) == 'lp') {
@@ -93,6 +102,10 @@ async function execute(command) {
 
 }
 
+/* cli() :
+* Waits for user command input --> prompts()
+* and executes it either synch- or asynchronously (with prefix '!') --> onSubmit
+*/
 async function cli() {
 
     const onSubmit = (_, command) => {
@@ -126,7 +139,7 @@ async function cli() {
 }
 
 
-
+// Execution starts here
 (async () => {
     while (true) {
         await cli();
