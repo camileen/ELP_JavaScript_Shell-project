@@ -9,7 +9,7 @@ The project implements a very simple command-line interface (CLI). It is meant t
 ## Usage :
 Only the following commands can be executed:  
 1. `lp`: lists all processes status (i.e. executes the Unix command `ps a`)
-2. `bing [-k|-p|-c] <processId>`: kills, pauses or awakes a process giving his process ID
+2. `bing [-k|-p|-c] <processId>`: kills, pauses or awakes a process giving his process ID (`bing` **must have an only option**)
 - option `-k` to kill
 - option `-p` to pause
 - option `-c` to awake
@@ -32,4 +32,4 @@ The *./tests* directory contains three files to test the CLI:
 
 ## Mentions:
 This project was conducted as an exercise whose specifications can be found [here](https://github.com/sfrenot/javascript/blob/master/ProjectDesc.md).  
-Special mention to [INSA Lyon](https://www.insa-lyon.fr) engineering school and its (fabulous) departmnt of Telecommunications.
+Special mention to [INSA Lyon](https://www.insa-lyon.fr) engineering school and its (fabulous) department of Telecommunications.
