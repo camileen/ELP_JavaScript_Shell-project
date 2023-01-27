@@ -9,13 +9,15 @@ readline.emitKeypressEvents(process.stdin);
 function detectExit(resolve) {
   process.stdin.on('keypress', (_, key) => {
     if (key && key.ctrl && key.name == 'p') {
-        resolve("\nEnd of CLI\n");
+        resolve("\n************ END OF CLI ************\n");
     }
   });
 }
 
 /**
+ * Executes a given command in a Bourne shell (sh) on a child process
  * @param {string} user_input
+ * @return {Promise} - The promise of the child process
  */ 
 function execute(user_input){
   return new Promise((resolve, reject) => {
@@ -36,8 +38,9 @@ function execute(user_input){
 
 
 /**
- * Waits for user's input command and executes it in a child process
- * @returns {Promise} - The CLI's promise
+ * Waits for user's input command and executes it in a child process.
+ * Runs until the returned promise is either resolved or rejected
+ * @returns {Promise} - The main CLI's promise
  */
 function cli() {
   return new Promise( (resolve, reject) => {
@@ -48,7 +51,6 @@ function cli() {
      */
     async function getCommand() {
       const onSubmit = async (_, command) => {
-        
         if (/^\./.test(command) || /^\//.test(command)) {
           result = await execute(command)
           console.log(result);
@@ -57,10 +59,8 @@ function cli() {
           result = execute(command.slice(1));
           result.then(value => console.log(value), reason => console.log("Captured an exception:\n", reason));
         }
-
         getCommand();
       }
-
       await prompts(
         {
           type: 'text', 
@@ -83,6 +83,8 @@ function quit(message) {
   process.exit();
 }
 
+
+//**************************** START OF EXECUTION *****************************
 let cliPromise = cli();
-cliPromise.then( (value) => quit(value), (err) => quit(err) );
+cliPromise.then( (value) => quit(value), (reason) =>  quit(reason) );
 
