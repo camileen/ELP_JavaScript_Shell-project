@@ -11,8 +11,12 @@ function detectExit(resolve) {
   });
 }
 
-function execute(command){
+function execute(user_input){
   return new Promise((resolve, reject) => {
+    command = user_input
+    if (/(.py)$/.test(user_input)) {
+      command = `python3 ${command}`
+    }
     exec(command, callback=(err, result) =>{
       if (err) {
         reject(err);
