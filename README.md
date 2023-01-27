@@ -18,8 +18,9 @@ Only the following commands can be executed:
 5. executes an executable file, shell or python script giving its relative or absolute path  
 (**WARNING:** error if the given file is an infinite loop)  
 
-**NOTES:** 
+## Things to improve :
 - Unknown commands don't cause an error but don't inform the user that the command is unknown
+- exiting the CLI after running an infinite loop in background won't kill the process running it
 
 ## Tests :
 The *./tests* directory contains three files to test the CLI:
