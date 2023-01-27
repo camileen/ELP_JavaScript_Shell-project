@@ -3,6 +3,9 @@ const prompts = require('prompts');
 let readline = require('readline');
 readline.emitKeypressEvents(process.stdin);
 
+/**
+ * @param {function} resolve - Resolves CLI's promise
+ */ 
 function detectExit(resolve) {
   process.stdin.on('keypress', (_, key) => {
     if (key && key.ctrl && key.name == 'p') {
@@ -11,6 +14,9 @@ function detectExit(resolve) {
   });
 }
 
+/**
+ * @param {string} user_input
+ */ 
 function execute(user_input){
   return new Promise((resolve, reject) => {
     command = user_input
@@ -27,15 +33,19 @@ function execute(user_input){
   })
 }
 
-function cli () {
+
+
+/**
+ * Waits for user's input command and executes it in a child process
+ * @returns {Promise} - The CLI's promise
+ */
+function cli() {
   return new Promise( (resolve, reject) => {
-    
-    /* detectExit()
-    * Detect end of CLI and exit it
-    * NOTE : don't work properly during synchronous execution
-    */
     detectExit(resolve);
     
+    /**
+     * Gets user's input command until the CLI's promise is resolved or rejected (recursive function)
+     */
     async function getCommand() {
       const onSubmit = async (_, command) => {
         
@@ -65,6 +75,9 @@ function cli () {
   })
 }
 
+/**
+ * @param {string} message - Displayed message before exiting the CLI
+ */
 function quit(message) {
   console.log(message);
   process.exit();
