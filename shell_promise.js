@@ -19,11 +19,16 @@ function detectExit(resolve) {
  * @param {string} user_input
  * @return {Promise} - The promise of the child process
  */ 
-function execute(user_input){
+function execute(user_command) {
   return new Promise((resolve, reject) => {
-    command = user_input
-    if (/(.py)$/.test(user_input)) {
-      command = `python3 ${command}`
+    let command;
+    if (/^\./.test(user_command) || /^\//.test(user_command)) {
+      if (/(.py)$/.test(user_command)) {
+        command = `python3 ${user_command}`;
+      } else if (/(.sh)$/.test(user_command) || /(.+)$/.test(user_command)) {
+        command = user_command;
+      } else {
+        reject("ERROR: Unknown command.");
     }
     exec(command, callback=(err, result) =>{
       if (err) {
@@ -32,6 +37,9 @@ function execute(user_input){
         resolve(result);
       }
     });
+    } else {
+      reject("ERROR: Unknown command.");
+    }
   })
 }
 
@@ -51,13 +59,17 @@ function cli() {
      */
     async function getCommand() {
       const onSubmit = async (_, command) => {
-        if (/^\./.test(command) || /^\//.test(command)) {
-          result = await execute(command)
-          console.log(result);
-          
-        } else if (/^!/.test(command)) {
+        let result;
+        if (/^!/.test(command)) {
           result = execute(command.slice(1));
-          result.then(value => console.log(value), reason => console.log("Captured an exception:\n", reason));
+          result.then((value) => console.log(value), (reason) => console.log(reason));
+        } else {
+          try {
+            result = await execute(command);
+            console.log(result);
+          } catch (error) {
+            console.log(error);
+          }
         }
         getCommand();
       }
