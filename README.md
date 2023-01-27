@@ -21,6 +21,11 @@ Only the following commands can be executed:
 **NOTES:** 
 - Unknown commands don't cause an error but don't inform the user that the command is unknown
 
+## Tests :
+The *./tests* directory contains three files to test the CLI:
+1. hello.py: just print *"hello from python file"*
+2. infinite.py: infinite loop (can't be executed from the CLI)
+3. sleep.sh: wait 2 seconds before printing *"I've sleep 2 seconds"*
 
 ## Contributors :
 [Xinyi ZHAO](https://github.com/Xinyi25) et [Camille ROBINSON](https://github.com/camileen)
