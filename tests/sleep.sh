@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sleep 10s
-echo "I've slept 10s"
+sleep 5s
+echo "I've slept 5s"
