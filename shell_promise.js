@@ -4,6 +4,7 @@ let readline = require('readline');
 readline.emitKeypressEvents(process.stdin);
 
 /**
+ * Detects "Ctrl+p" keystroke and resolves the CLI's promise
  * @param {function} resolve - Resolves CLI's promise
  */ 
 function detectExit(resolve) {
@@ -16,13 +17,12 @@ function detectExit(resolve) {
 
 /**
  * Executes a given command in a Bourne shell (sh) on a child process
- * @param {string} user_input
- * @return {Promise} - The promise of the child process
+ * @param {string} user_command
+ * @return {Promise} - The promise of the child process that executes the command
  */ 
 function execute(user_command) {
   return new Promise((resolve, reject) => {
     let command;
-    
     if (/^\./.test(user_command) || /^\//.test(user_command)) {
       if (/(.py)$/.test(user_command)) {
         command = `python3 ${user_command}`;
@@ -48,7 +48,6 @@ function execute(user_command) {
       } else {
         reject("ERROR: Missing process ID.");
       }
-      
     }
     
     if (command != undefined) {
