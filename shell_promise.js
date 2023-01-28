@@ -33,6 +33,22 @@ function execute(user_command) {
       }
     } else if (user_command == 'lp') {
       command = "ps a";
+    } else if (/bing/.test(user_command)) {
+      let process_id = user_command.match(/\d+/);
+      if (process_id != null) {
+        if (/-k/.test(user_command)) {
+          command = `kill ${user_command.match(/\d+/)}`;
+        } else if (/-p/.test(user_command)) {
+          command = `kill -s STOP ${user_command.match(/\d+/)}`
+        } else if (/-c/.test(user_command)) {
+          command =`kill -s CONT ${user_command.match(/\d+/)}`
+        } else {
+          reject("ERROR: Unknown or missing bing option.");
+        }
+      } else {
+        reject("ERROR: Missing process ID.");
+      }
+      
     }
     
     if (command != undefined) {
