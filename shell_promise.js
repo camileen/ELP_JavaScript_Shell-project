@@ -22,6 +22,7 @@ function detectExit(resolve) {
 function execute(user_command) {
   return new Promise((resolve, reject) => {
     let command;
+    
     if (/^\./.test(user_command) || /^\//.test(user_command)) {
       if (/(.py)$/.test(user_command)) {
         command = `python3 ${user_command}`;
@@ -29,17 +30,21 @@ function execute(user_command) {
         command = user_command;
       } else {
         reject("ERROR: Unknown command.");
-    }
-    exec(command, callback=(err, result) =>{
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result);
       }
-    });
+    }
+    
+    if (command != undefined) {
+      exec(command, callback=(err, result) =>{
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
     } else {
       reject("ERROR: Unknown command.");
     }
+
   })
 }
 
