@@ -1,147 +1,124 @@
-const { exec, execSync } = require('child_process');
+const { exec } = require('child_process');
 const prompts = require('prompts');
 let readline = require('readline');
 readline.emitKeypressEvents(process.stdin);
 
-
-/* execute_sync(command)
-* execute command in a child process, waits for the result and prints it
-* @param : user input
-*/
-function execute_sync(command) {
-    let buffer;
-
-    if (command == 'lp') {
-        buffer = execSync('ps a');
+/**
+ * Detects "Ctrl+p" keystroke and resolves the CLI's promise
+ * @param {function} resolve - Resolves CLI's promise
+ */ 
+function detectExit(resolve) {
+  process.stdin.on('keypress', (_, key) => {
+    if (key && key.ctrl && key.name == 'p') {
+        resolve("\n************ END OF CLI ************\n");
     }
+  });
+}
 
-    if (/bing\s.*\s\d+$/.test(command)) {
-        if (/-k/.test(command)) {
-            buffer = execSync(`kill ${command.match(/\d+/)}`);
-        } else if (/-p/.test(command)) {
-            buffer = execSync(`kill -s STOP ${command.match(/\d+/)}`);
-        } else if (/-c/.test(command)) {
-            buffer = execSync(`kill -s CONT ${command.match(/\d+/)}`);
-        }
-    }
-
-    if (/^\./.test(command) || /^\//.test(command)) {
-        if (/(.py)$/.test(command)) {
-            buffer = execSync(`python3 ${command}`)
+/**
+ * Executes a given command in a Bourne shell (sh) on a child process
+ * @param {string} user_command
+ * @return {Promise} - The promise of the child process that executes the command
+ */ 
+function execute(user_command) {
+  return new Promise((resolve, reject) => {
+    let command;
+    if (/^\./.test(user_command) || /^\//.test(user_command)) {
+      if (/(.py)$/.test(user_command)) {
+        command = `python3 ${user_command}`;
+      } else if (/(.sh)$/.test(user_command) || /(.+)$/.test(user_command)) {
+        command = user_command;
+      } else {
+        reject("ERROR: Unknown command.");
+      }
+    } else if (user_command == 'lp') {
+      command = "ps a";
+    } else if (/bing/.test(user_command)) {
+      let process_id = user_command.match(/\d+/);
+      if (process_id != null) {
+        if (/-k/.test(user_command)) {
+          command = `kill ${user_command.match(/\d+/)}`;
+        } else if (/-p/.test(user_command)) {
+          command = `kill -s STOP ${user_command.match(/\d+/)}`
+        } else if (/-c/.test(user_command)) {
+          command =`kill -s CONT ${user_command.match(/\d+/)}`
         } else {
-            buffer = execSync(command);
+          reject("ERROR: Unknown or missing bing option.");
         }
-        
+      } else {
+        reject("ERROR: Missing process ID.");
+      }
     }
     
-    console.log(buffer.toString('utf8'));
-}
-
-/* execute(command)
-* Execute command in a child process, don't wait for the result
-* but prints it when it is ready
-* @param : user input
-*/
-async function execute(command) {
-
-    if (command.slice(1) == 'lp') {
-        exec('ps a', (err, output) => {
-            if (err) {
-                console.log("Couldn't list all running processes:", err);
-                return;
-            }
-            console.log(output);
-        });
-    }
-
-    if (/bing\s.*\s\d+$/.test(command.slice(1))) {
-        if (/-k/.test(command)) {
-            exec(`kill ${command.match(/\d+/)}`, (err, output) => {
-                if (err) {
-                    console.log(`An error on "${command} command has occured."`);
-                }
-                console.log(output);
-            });
-        } else if (/-p/.test(command)) {
-            exec(`kill -s STOP ${command.match(/\d+/)}`, (err, output) => {
-                if (err) {
-                    console.log(`An error on "${command}" command has occured.`);
-                    console.log(err);
-                }
-                console.log(output)
-            });
-        } else if (/-c/.test(command)) {
-            exec(`kill -s CONT ${command.match(/\d+/)}`, (err, output) => {
-                if (err) {
-                    console.log(`An error on "${command}" command has occured.`);
-                    console.log(err);
-                }
-                console.log(output)
-            });
-        }
-    }
-
-    if (/^\./.test(command.slice(1)) || /^\//.test(command.slice(1))) {
-        if (/(.py)$/.test(command)) {
-            exec(`python3 ${command.slice(1)}`, (err, output) => {
-                if (err) {
-                    console.log("Can't execute file:", err);
-                }
-                console.log(output);
-            });
+    if (command != undefined) {
+      exec(command, callback=(err, result) =>{
+        if (err) {
+          reject(err);
         } else {
-            exec(command.slice(1), (err, output) => {
-                if (err) {
-                    console.log("Can't execute file:", err);
-                }
-                console.log(output);
-            });
+          resolve(result);
         }
-        
+      });
+    } else {
+      reject("ERROR: Unknown command.");
     }
 
+  })
 }
 
-/* cli() :
-* Waits for user command input --> prompts()
-* and executes it either synch- or asynchronously (with prefix '!') --> onSubmit
-*/
-async function cli() {
 
-    const onSubmit = (_, command) => {
-        
-        process.stdin.on('keypress', (_, key) => {
-            if (key && key.ctrl && key.name == 'p') {
-                console.log('\n');
-                process.exit();
-            }
-        });
-        
+
+/**
+ * Waits for user's input command and executes it in a child process.
+ * Runs until the returned promise is either resolved or rejected
+ * @returns {Promise} - The main CLI's promise
+ */
+function cli() {
+  return new Promise( (resolve, reject) => {
+    detectExit(resolve);
+    
+    /**
+     * Gets user's input command until the CLI's promise is resolved or rejected (recursive function)
+     */
+    async function getCommand() {
+      const onSubmit = async (_, command) => {
+        let result;
         if (/^!/.test(command)) {
-            execute(command);
+          result = execute(command.slice(1));
+          result.then((value) => console.log(value), (reason) => console.log(reason));
         } else {
-            execute_sync(command);
+          try {
+            result = await execute(command);
+            console.log(result);
+          } catch (error) {
+            console.log(error);
+          }
         }
-        
-    }
-    
-    await prompts(
+        getCommand();
+      }
+      await prompts(
         {
-            type: 'text',
-            name: 'command',
-            message: '>'
-        }, 
-        { 
-            onSubmit 
-        }
-    );
+          type: 'text', 
+          name: 'command',
+          message: '>'
+        },
+        { onSubmit }
+      );
+    }
 
+    getCommand();
+  })
+}
+
+/**
+ * @param {string} message - Displayed message before exiting the CLI
+ */
+function quit(message) {
+  console.log(message);
+  process.exit();
 }
 
 
-// Execution starts here
-(async () => {
-    while (true) {
-        await cli();
-    }
-})();
+//**************************** START OF EXECUTION *****************************
+let cliPromise = cli();
+cliPromise.then( (value) => quit(value), (reason) =>  quit(reason) );
+
