@@ -31,6 +31,8 @@ function execute(user_command) {
       } else {
         reject("ERROR: Unknown command.");
       }
+    } else if (user_command == 'lp') {
+      command = "ps a";
     }
     
     if (command != undefined) {
