@@ -23,15 +23,7 @@ function detectExit(resolve) {
 function execute(user_command) {
   return new Promise((resolve, reject) => {
     let command;
-    if (/^\./.test(user_command) || /^\//.test(user_command)) {
-      if (/(.py)$/.test(user_command)) {
-        command = `python3 ${user_command}`;
-      } else if (/(.sh)$/.test(user_command) || /(.+)$/.test(user_command)) {
-        command = user_command;
-      } else {
-        reject("ERROR: Unknown command.");
-      }
-    } else if (user_command == 'lp') {
+    if (user_command == 'lp') {
       command = "ps a";
     } else if (/bing/.test(user_command)) {
       let process_id = user_command.match(/\d+/);
