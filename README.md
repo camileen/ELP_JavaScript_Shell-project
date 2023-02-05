@@ -16,7 +16,7 @@ Only the following commands can be executed:
 - option `-p` to pause a process
 - option `-c` to awake a process
 3. prefix `!`: executes a command on background
-4. keyboard interruption with `Ctrl+p`: exits the CLI  
+4. `Ctrl+p`: exits the CLI 
 5. executes any linux command (Bourne shell's commands more specifically)  
 
 **WARNINGS:** 
@@ -24,8 +24,7 @@ Only the following commands can be executed:
 
 ## Critics :
 - Created child processes continue to run after exiting the CLI
-- Can't stop a process running in foreground before its end
-- Press Enter is interpreted as an unknown command
+- Can stop a process running in foreground before its end with Ctrl+c but it also exits the CLI
 
 ## Tests :
 The *./tests* directory contains three files to test the CLI:
