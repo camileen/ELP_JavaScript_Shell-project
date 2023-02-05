@@ -23,8 +23,8 @@ function detectExit(resolve) {
 function execute(user_command) {
   return new Promise((resolve, reject) => {
     let command;
-    if (user_command == 'lp') {
-      command = "ps a";
+    if (/lp */.test(user_command)) {
+      command = "ps -a";
     } else if (/bing/.test(user_command)) {
       let process_id = user_command.match(/\d+/);
       if (process_id != null) {
@@ -41,16 +41,24 @@ function execute(user_command) {
         reject("ERROR: Missing process ID.");
       }
     } else {
-      command = user_command
+      command = user_command.slice(1)
     } 
 
-    exec(command, callback=(err, result) =>{
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    subProcess = exec(command)
+
+    subProcess.stdout.on('data', (data) => {
+      console.log(data);
+    });
+    subProcess.stderr.on('data', (data) => {
+      console.log(data);
+    });
+    subProcess.on('close', (code) => {
+      if (user_command[0] == '!') {
+        console.log(`Child process exits with code ${code}`)
+      }
+      resolve();
+    });
+    
   })
 }
 
@@ -63,6 +71,7 @@ function execute(user_command) {
  */
 function cli() {
   return new Promise( (resolve, reject) => {
+    
     detectExit(resolve);
     
     /**
@@ -70,28 +79,29 @@ function cli() {
      */
     async function getCommand() {
       const onSubmit = async (_, command) => {
-        let result;
         if (/^!/.test(command)) {
-          result = execute(command.slice(1));
-          result.then((value) => console.log(value), (reason) => console.log(reason));
-        } else {
+          execute(command);
+        } else if (command != '') {
           try {
-            result = await execute(command);
-            console.log(result);
+            await execute(command);
           } catch (error) {
-            console.log(error);
+            console.log(error)
           }
         }
         getCommand();
       }
+
+      const onCancel = getCommand;
+
       await prompts(
         {
           type: 'text', 
           name: 'command',
           message: '>'
         },
-        { onSubmit }
+        { onSubmit, onCancel }
       );
+      
     }
 
     getCommand();
