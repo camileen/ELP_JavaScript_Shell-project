@@ -17,7 +17,7 @@ Only the following commands can be executed:
 - option `-c` to awake a process
 3. prefix `!`: executes a command on background
 4. keyboard interruption with `Ctrl+p`: exits the CLI  
-5. executes an executable file, shell or python script giving its relative or absolute path  
+5. executes any linux command (Bourne shell's commands more specifically)  
 
 **WARNINGS:** 
 - Prevent using VSCode integrated terminal or you will not be able to use `Ctrl+p` to exit the CLI (it corresponds to a default keyboard shortcut of VSCode)  
