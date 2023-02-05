@@ -16,7 +16,7 @@ function detectExit(resolve) {
 }
 
 /**
- * Executes a given command in a Bourne shell (sh) on a child process
+ * Executes a given command in a Bourne shell (sh) in a child process
  * @param {string} user_command
  * @return {Promise} - The promise of the child process that executes the command
  */ 
@@ -48,20 +48,17 @@ function execute(user_command) {
       } else {
         reject("ERROR: Missing process ID.");
       }
-    }
-    
-    if (command != undefined) {
-      exec(command, callback=(err, result) =>{
+    } else {
+      command = user_command
+    } 
+
+    exec(command, callback=(err, result) =>{
         if (err) {
           reject(err);
         } else {
           resolve(result);
         }
       });
-    } else {
-      reject("ERROR: Unknown command.");
-    }
-
   })
 }
 
