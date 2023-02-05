@@ -41,7 +41,7 @@ function execute(user_command) {
         reject("ERROR: Missing process ID.");
       }
     } else {
-      command = user_command.slice(1)
+      command = (user_command[0] == '!') ? user_command.slice(1) : user_command
     } 
 
     subProcess = exec(command)
